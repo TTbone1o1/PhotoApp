@@ -129,27 +129,31 @@ class ViewController: UIViewController {
     }
 
     @objc private func didTapTakePhoto() {
-        // Hide shutter button immediately
-        shutterButton.isHidden = true
-        
         // Add enhanced bouncing animation
         UIView.animate(withDuration: 0.1, // Initial scale down duration
                        animations: {
                            self.shutterButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
                        },
                        completion: { _ in
-                           UIView.animate(withDuration: 0.2, // Bounce up duration
+                           UIView.animate(withDuration: 0.3, // Bounce up duration
                                           delay: 0,
                                           usingSpringWithDamping: 0.5,
-                                          initialSpringVelocity: 1.5,
+                                          initialSpringVelocity: 1.0,
                                           options: .allowUserInteraction,
                                           animations: {
-                                              self.shutterButton.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+                                              self.shutterButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
                                           },
                                           completion: { _ in
-                                              UIView.animate(withDuration: 0.1, // Return to normal size duration
+                                              UIView.animate(withDuration: 0.2, // Return to normal size duration
                                                              animations: {
-                                                                 self.shutterButton.transform = CGAffineTransform.identity
+                                                                 self.shutterButton.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+                                                             },
+                                                             completion: { _ in
+                                                                 UIView.animate(withDuration: 0.1, // Final return to normal size duration
+                                                                                animations: {
+                                                                                    self.shutterButton.transform = CGAffineTransform.identity
+                                                                                    self.shutterButton.isHidden = true // Hide the shutter button after animation
+                                                                                })
                                                              })
                                           })
                        })
