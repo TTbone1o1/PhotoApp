@@ -9,6 +9,10 @@ class ViewController: UIViewController {
     let output = AVCapturePhotoOutput()
     // Video Preview
     let previewLayer = AVCaptureVideoPreviewLayer()
+    
+    // Array to store captured photos
+    var capturedPhotos: [UIImage] = []
+
     // Shutter button
     private let shutterButton: UIView = {
         let outerCircle = UIView(frame: CGRect(x: 0, y: 0, width: 75, height: 75))
@@ -25,6 +29,19 @@ class ViewController: UIViewController {
         return outerCircle
     }()
     
+    // Thumbnail view to display captured photo
+    private let thumbnailView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .black
+        imageView.layer.cornerRadius = 8
+        imageView.layer.borderWidth = 2
+        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
+        return imageView
+    }()
+    
     // Image view to display captured photo
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -39,6 +56,7 @@ class ViewController: UIViewController {
         view.backgroundColor = .black
         view.layer.addSublayer(previewLayer)
         view.addSubview(shutterButton)
+        view.addSubview(thumbnailView) // Add thumbnail view to the view
         checkCameraPermissions()
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapTakePhoto))
@@ -47,6 +65,10 @@ class ViewController: UIViewController {
         // Add tap gesture recognizer to imageView
         let imageTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapImageView))
         imageView.addGestureRecognizer(imageTapGesture)
+        
+        // Add tap gesture recognizer to thumbnailView
+        let thumbnailTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapThumbnailView))
+        thumbnailView.addGestureRecognizer(thumbnailTapGesture)
     }
 
     override func viewDidLayoutSubviews() {
@@ -54,6 +76,9 @@ class ViewController: UIViewController {
         previewLayer.frame = view.bounds
         
         shutterButton.center = CGPoint(x: view.frame.size.width / 2, y: view.frame.size.height - 100)
+        
+        // Position thumbnail view in the bottom left corner
+        thumbnailView.frame = CGRect(x: 20, y: view.frame.size.height - 100, width: 80, height: 80)
         
         // Bring shutter button to front
         view.bringSubviewToFront(shutterButton)
@@ -104,6 +129,9 @@ class ViewController: UIViewController {
     }
 
     @objc private func didTapTakePhoto() {
+        // Hide shutter button immediately
+        shutterButton.isHidden = true
+        
         // Add enhanced bouncing animation
         UIView.animate(withDuration: 0.1, // Initial scale down duration
                        animations: {
@@ -122,10 +150,6 @@ class ViewController: UIViewController {
                                               UIView.animate(withDuration: 0.1, // Return to normal size duration
                                                              animations: {
                                                                  self.shutterButton.transform = CGAffineTransform.identity
-                                                                 self.shutterButton.alpha = 0
-                                                             },
-                                                             completion: { _ in
-                                                                 self.shutterButton.isHidden = true // Hide the shutter button after animation
                                                              })
                                           })
                        })
@@ -134,11 +158,35 @@ class ViewController: UIViewController {
     }
 
     @objc private func didTapImageView() {
-        imageView.removeFromSuperview() // Remove the image view
-        session?.startRunning() // Restart the camera session
-        shutterButton.isHidden = false // Show the shutter button again
-        UIView.animate(withDuration: 0.3) {
-            self.shutterButton.alpha = 1
+        UIView.animate(withDuration: 0.3, animations: {
+            self.imageView.alpha = 0
+        }) { _ in
+            self.imageView.removeFromSuperview() // Remove the image view
+            self.session?.startRunning() // Restart the camera session
+            self.shutterButton.isHidden = false // Show the shutter button again
+            UIView.animate(withDuration: 0.3) {
+                self.shutterButton.alpha = 1
+            }
+        }
+    }
+    
+    @objc private func didTapThumbnailView() {
+        // Hide shutter button
+        shutterButton.isHidden = true
+        
+        // Enlarge thumbnail view with animation
+        UIView.animate(withDuration: 0.3, animations: {
+            self.thumbnailView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        }) { _ in
+            self.imageView.image = self.thumbnailView.image
+            self.imageView.frame = self.view.bounds
+            self.view.addSubview(self.imageView)
+            
+            // Animate the image view appearing
+            self.imageView.alpha = 0
+            UIView.animate(withDuration: 0.3) {
+                self.imageView.alpha = 1
+            }
         }
     }
 }
@@ -148,10 +196,25 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         guard let data = photo.fileDataRepresentation(), let image = UIImage(data: data) else {
             return
         }
+        
+        // Save the image to the photo library
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        
+        // Add the image to the array of captured photos
+        capturedPhotos.append(image)
+        
+        // Update the thumbnail view with the most recent photo
+        thumbnailView.image = image
+        
         session?.stopRunning() // Stop the camera session
 
+        // Animate the image view appearing
         imageView.image = image // Display captured image in imageView
         imageView.frame = view.bounds
+        imageView.alpha = 0
         view.addSubview(imageView)
+        UIView.animate(withDuration: 0.3) {
+            self.imageView.alpha = 1
+        }
     }
 }
