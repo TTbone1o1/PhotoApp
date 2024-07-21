@@ -51,6 +51,8 @@ class ViewController: UIViewController {
         return imageView
     }()
     
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -129,6 +131,8 @@ class ViewController: UIViewController {
     }
 
     @objc private func didTapTakePhoto() {
+        feedbackGenerator.impactOccurred() // Haptic feedback
+        
         // Add enhanced bouncing animation
         UIView.animate(withDuration: 0.1, // Initial scale down duration
                        animations: {
@@ -185,6 +189,8 @@ class ViewController: UIViewController {
     }
     
     @objc private func didTapThumbnailView() {
+        feedbackGenerator.impactOccurred() // Haptic feedback
+        
         // Hide shutter button
         shutterButton.isHidden = true
         
