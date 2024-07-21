@@ -152,7 +152,17 @@ class ViewController: UIViewController {
                                                                  UIView.animate(withDuration: 0.1, // Final return to normal size duration
                                                                                 animations: {
                                                                                     self.shutterButton.transform = CGAffineTransform.identity
-                                                                                    self.shutterButton.isHidden = true // Hide the shutter button after animation
+                                                                                },
+                                                                                completion: { _ in
+                                                                                    // Bounce-out animation
+                                                                                    UIView.animate(withDuration: 0.3, // Bounce-out duration
+                                                                                                   animations: {
+                                                                                                       self.shutterButton.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+                                                                                                   },
+                                                                                                   completion: { _ in
+                                                                                                       self.shutterButton.isHidden = true // Hide the shutter button after bounce-out
+                                                                                                       self.shutterButton.transform = CGAffineTransform.identity // Reset the transformation
+                                                                                                   })
                                                                                 })
                                                              })
                                           })
@@ -200,23 +210,23 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         guard let data = photo.fileDataRepresentation(), let image = UIImage(data: data) else {
             return
         }
-        
-        // Save the image to the photo library
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        
-        // Add the image to the array of captured photos
         capturedPhotos.append(image)
-        
-        // Update the thumbnail view with the most recent photo
         thumbnailView.image = image
+        thumbnailView.transform = .identity // Reset thumbnail view transformation
         
-        session?.stopRunning() // Stop the camera session
-
+        // Optionally: add a brief animation to the thumbnail view
+        UIView.animate(withDuration: 0.3) {
+            self.thumbnailView.alpha = 1
+        }
+        
+        // Stop camera session and display captured photo
+        session?.stopRunning()
+        self.imageView.image = image
+        self.imageView.frame = self.view.bounds
+        self.view.addSubview(self.imageView)
+        
         // Animate the image view appearing
-        imageView.image = image // Display captured image in imageView
-        imageView.frame = view.bounds
-        imageView.alpha = 0
-        view.addSubview(imageView)
+        self.imageView.alpha = 0
         UIView.animate(withDuration: 0.3) {
             self.imageView.alpha = 1
         }
