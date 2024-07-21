@@ -33,7 +33,7 @@ class ViewController: UIViewController {
     private let thumbnailView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = .black
+        imageView.backgroundColor = .clear
         imageView.layer.cornerRadius = 8
         imageView.layer.borderWidth = 2
         imageView.layer.borderColor = UIColor.white.cgColor
@@ -78,7 +78,7 @@ class ViewController: UIViewController {
         shutterButton.center = CGPoint(x: view.frame.size.width / 2, y: view.frame.size.height - 100)
         
         // Position thumbnail view in the bottom left corner
-        thumbnailView.frame = CGRect(x: 20, y: view.frame.size.height - 100, width: 80, height: 80)
+        thumbnailView.frame = CGRect(x: 20, y: view.frame.size.height - 140, width: 80, height: 80)
         
         // Bring shutter button to front
         view.bringSubviewToFront(shutterButton)

@@ -20,5 +20,5 @@ struct PhotoAppView: View {
 }
 
 #Preview {
-    PhotoAppView()
+    ViewController()
 }
