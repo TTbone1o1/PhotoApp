@@ -12,7 +12,7 @@ class PhotoAppFront: UIViewController, UINavigationControllerDelegate {
         return label
     }()
 
-    private let slideTransition = SlideTransition()
+    private let slideTransition = SlideTransition(isPresenting: true)
 
     override func viewDidLoad() {
         super.viewDidLoad()
