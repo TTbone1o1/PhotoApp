@@ -189,25 +189,42 @@ class ViewController: UIViewController {
     }
     
     @objc private func didTapThumbnailView() {
-        feedbackGenerator.impactOccurred() // Haptic feedback
+        feedbackGenerator.impactOccurred()
         
-        // Hide shutter button
-        shutterButton.isHidden = true
+        // Get the initial and final frames
+        let thumbnailInitialFrame = thumbnailView.convert(thumbnailView.bounds, to: view)
+        let imageViewFinalFrame = view.convert(imageView.bounds, from: imageView)
         
-        // Enlarge thumbnail view with animation
+        // Create a snapshot of the thumbnail view
+        let thumbnailSnapshot = UIImageView(frame: thumbnailInitialFrame)
+        thumbnailSnapshot.image = thumbnailView.image
+        thumbnailSnapshot.contentMode = .scaleAspectFill
+        thumbnailSnapshot.clipsToBounds = true
+        view.addSubview(thumbnailSnapshot)
+        
+        // Hide the original thumbnail view
+        thumbnailView.isHidden = true
+        
+        // Set up the image view
+        imageView.frame = view.bounds
+        imageView.alpha = 0
+        imageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        view.addSubview(imageView)
+        
+        // Perform the animation
         UIView.animate(withDuration: 0.3, animations: {
-            self.thumbnailView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
-        }) { _ in
-            self.imageView.image = self.thumbnailView.image
-            self.imageView.frame = self.view.bounds
-            self.view.addSubview(self.imageView)
+            // Animate the snapshot to match the final image view frame
+            thumbnailSnapshot.frame = imageViewFinalFrame
+            thumbnailSnapshot.alpha = 0
             
-            // Animate the image view appearing
-            self.imageView.alpha = 0
-            UIView.animate(withDuration: 0.3) {
-                self.imageView.alpha = 1
-            }
-        }
+            // Animate the image view appearance
+            self.imageView.alpha = 1
+            self.imageView.transform = .identity
+        }, completion: { _ in
+            // Cleanup
+            thumbnailSnapshot.removeFromSuperview()
+            self.thumbnailView.isHidden = false
+        })
     }
 }
 
