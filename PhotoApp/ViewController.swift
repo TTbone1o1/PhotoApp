@@ -191,23 +191,46 @@ class ViewController: UIViewController {
     @objc private func didTapThumbnailView() {
         feedbackGenerator.impactOccurred() // Haptic feedback
         
-        // Hide shutter button
-        shutterButton.isHidden = true
-        
-        // Enlarge thumbnail view with animation
-        UIView.animate(withDuration: 0.3, animations: {
-            self.thumbnailView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
-        }) { _ in
-            self.imageView.image = self.thumbnailView.image
-            self.imageView.frame = self.view.bounds
-            self.view.addSubview(self.imageView)
-            
-            // Animate the image view appearing
-            self.imageView.alpha = 0
-            UIView.animate(withDuration: 0.3) {
-                self.imageView.alpha = 1
-            }
-        }
+        // Apply the same bouncing animation with less scaling to thumbnailView
+        UIView.animate(withDuration: 0.1, // Initial scale down duration
+                       animations: {
+                           self.thumbnailView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+                       },
+                       completion: { _ in
+                           UIView.animate(withDuration: 0.3, // Bounce up duration
+                                          delay: 0,
+                                          usingSpringWithDamping: 0.5,
+                                          initialSpringVelocity: 1.0,
+                                          options: .allowUserInteraction,
+                                          animations: {
+                                              self.thumbnailView.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+                                          },
+                                          completion: { _ in
+                                              UIView.animate(withDuration: 0.2, // Return to normal size duration
+                                                             animations: {
+                                                                 self.thumbnailView.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+                                                             },
+                                                             completion: { _ in
+                                                                 UIView.animate(withDuration: 0.1, // Final return to normal size duration
+                                                                                animations: {
+                                                                                    self.thumbnailView.transform = CGAffineTransform.identity
+                                                                                },
+                                                                                completion: { _ in
+                                                                                    // Proceed with existing functionality
+                                                                                    self.shutterButton.isHidden = true
+                                                                                    self.imageView.image = self.thumbnailView.image
+                                                                                    self.imageView.frame = self.view.bounds
+                                                                                    self.view.addSubview(self.imageView)
+                                                                                    
+                                                                                    // Animate the image view appearing
+                                                                                    self.imageView.alpha = 0
+                                                                                    UIView.animate(withDuration: 0.3) {
+                                                                                        self.imageView.alpha = 1
+                                                                                    }
+                                                                                })
+                                                             })
+                                          })
+                       })
     }
 }
 
