@@ -16,6 +16,7 @@
 		CD83F5F92C4DAA1800D04900 /* PhotoAppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD83F5F82C4DAA1800D04900 /* PhotoAppView.swift */; };
 		CD84FCF12C4EC866009F311E /* ShutterAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD84FCF02C4EC866009F311E /* ShutterAnimation.swift */; };
 		CD84FCF32C4EFC58009F311E /* PhotoAppFront.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD84FCF22C4EFC58009F311E /* PhotoAppFront.swift */; };
+		CD84FCF52C4F054E009F311E /* SlideTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD84FCF42C4F054E009F311E /* SlideTransition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		CD83F5F82C4DAA1800D04900 /* PhotoAppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAppView.swift; sourceTree = "<group>"; };
 		CD84FCF02C4EC866009F311E /* ShutterAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterAnimation.swift; sourceTree = "<group>"; };
 		CD84FCF22C4EFC58009F311E /* PhotoAppFront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAppFront.swift; sourceTree = "<group>"; };
+		CD84FCF42C4F054E009F311E /* SlideTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideTransition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				CD83F5ED2C4D70F300D04900 /* Assets.xcassets */,
 				CD83F5EF2C4D70F300D04900 /* LaunchScreen.storyboard */,
 				CD83F5F22C4D70F300D04900 /* Info.plist */,
+				CD84FCF42C4F054E009F311E /* SlideTransition.swift */,
 			);
 			path = PhotoApp;
 			sourceTree = "<group>";
@@ -147,6 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD84FCF52C4F054E009F311E /* SlideTransition.swift in Sources */,
 				CD83F5E92C4D70F000D04900 /* ViewController.swift in Sources */,
 				CD83F5E52C4D70F000D04900 /* AppDelegate.swift in Sources */,
 				CD84FCF32C4EFC58009F311E /* PhotoAppFront.swift in Sources */,
