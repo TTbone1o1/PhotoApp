@@ -232,9 +232,15 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         self.view.addSubview(self.imageView)
         
         // Animate the image view appearing
-        self.imageView.alpha = 0
-        UIView.animate(withDuration: 0.3) {
-            self.imageView.alpha = 1
-        }
+        self.imageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        UIView.animate(withDuration: 0.4,
+                       delay: 0,
+                       usingSpringWithDamping: 0.5,
+                       initialSpringVelocity: 0.6,
+                       options: [.curveEaseInOut],
+                       animations: {
+                           self.imageView.transform = CGAffineTransform.identity
+        })
+
     }
 }
