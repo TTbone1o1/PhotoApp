@@ -233,14 +233,9 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         
         // Animate the image view appearing
         self.imageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-        UIView.animate(withDuration: 0.4,
-                       delay: 0,
-                       usingSpringWithDamping: 0.5,
-                       initialSpringVelocity: 0.6,
-                       options: [.curveEaseInOut],
-                       animations: {
-                           self.imageView.transform = CGAffineTransform.identity
-        })
-
+                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.6, options: [.curveEaseInOut], animations: {
+                    self.imageView.transform = CGAffineTransform.identity
+                    self.imageView.alpha = 1
+                })
     }
 }
