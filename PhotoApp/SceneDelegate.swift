@@ -1,9 +1,6 @@
-//
-//  SceneDelegate.swift
-//  PhotoApp
-//
-//  Created by Abraham May on 7/21/24.
-//
+// SceneDelegate.swift
+// PhotoApp
+// Created by Abraham May on 7/21/24.
 
 import UIKit
 
@@ -11,12 +8,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        // Ensure we have a UIWindowScene
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+
+        // Create a new UIWindow using the windowScene
+        let window = UIWindow(windowScene: windowScene)
+        
+        // Set the root view controller to PhotoAppFront
+        let photoAppFront = PhotoAppFront()
+        window.rootViewController = UINavigationController(rootViewController: photoAppFront)
+        
+        // Assign the window to the window property and make it key and visible
+        self.window = window
+        window.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -46,7 +51,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
-
-
 }
-
