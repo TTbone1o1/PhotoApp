@@ -24,9 +24,9 @@ class PhotoAppFront: UIViewController {
         ])
         
         // Add a swipe gesture recognizer
-        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
-        swipeRight.direction = .right
-        view.addGestureRecognizer(swipeRight)
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
+        swipeLeft.direction = .left
+        view.addGestureRecognizer(swipeLeft)
     }
 
     @objc private func didSwipeRight() {
