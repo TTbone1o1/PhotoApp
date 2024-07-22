@@ -2,31 +2,34 @@ import UIKit
 
 class PhotoAppFront: UIViewController {
 
-    private let label: UILabel = {
+    private let instructionLabel: UILabel = {
         let label = UILabel()
         label.text = "Go Take A Photo"
+        label.textColor = .black // Ensure the text color contrasts with the background
         label.font = UIFont.systemFont(ofSize: 24)
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false // Enable auto layout
         return label
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        view.addSubview(label)
-
+        view.addSubview(instructionLabel)
+        
+        // Set up constraints to center the label in the view
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            instructionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            instructionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-
-        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
-        swipeGesture.direction = .left
-        view.addGestureRecognizer(swipeGesture)
+        
+        // Add a swipe gesture recognizer
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
+        swipeRight.direction = .right
+        view.addGestureRecognizer(swipeRight)
     }
 
-    @objc private func handleSwipe() {
+    @objc private func didSwipeRight() {
         let viewController = ViewController()
         navigationController?.pushViewController(viewController, animated: true)
     }
