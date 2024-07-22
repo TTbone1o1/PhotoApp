@@ -1,6 +1,6 @@
 import UIKit
 
-class PhotoAppFront: UIViewController {
+class PhotoAppFront: UIViewController, UINavigationControllerDelegate {
 
     private let instructionLabel: UILabel = {
         let label = UILabel()
@@ -11,6 +11,8 @@ class PhotoAppFront: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false // Enable auto layout
         return label
     }()
+
+    private let slideTransition = SlideTransition()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,13 +26,21 @@ class PhotoAppFront: UIViewController {
         ])
         
         // Add a swipe gesture recognizer
-        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeLeft))
         swipeLeft.direction = .left
         view.addGestureRecognizer(swipeLeft)
+        
+        navigationController?.delegate = self
     }
 
-    @objc private func didSwipeRight() {
+    @objc private func didSwipeLeft() {
         let viewController = ViewController()
         navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    // MARK: - UINavigationControllerDelegate
+
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return slideTransition
     }
 }
