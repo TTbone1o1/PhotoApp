@@ -24,6 +24,8 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Allow to use camera</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Allow to use libray</string>
+	<string>Allow to use library</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow to use library</string>
 </dict>
 </plist>
