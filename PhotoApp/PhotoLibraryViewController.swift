@@ -22,6 +22,11 @@ class PhotoLibraryViewController: UIViewController, UICollectionViewDataSource, 
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         
         loadPhotos()
+        
+        // Add swipe gesture recognizer for navigating back
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
+        swipeGesture.direction = .right
+        view.addGestureRecognizer(swipeGesture)
     }
     
     private func loadPhotos() {
@@ -68,5 +73,10 @@ class PhotoLibraryViewController: UIViewController, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (view.bounds.width - 20) / 3
         return CGSize(width: width, height: width)
+    }
+    
+    // Handles swipe right to return to ViewController
+    @objc private func didSwipeRight() {
+        dismiss(animated: true, completion: nil)
     }
 }
