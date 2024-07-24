@@ -60,10 +60,16 @@ class PhotoLibraryViewController: UIViewController, UICollectionViewDataSource, 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+        
+        // Remove existing subviews to avoid overlapping
+        cell.contentView.subviews.forEach { $0.removeFromSuperview() }
+        
         let imageView = UIImageView(frame: cell.contentView.bounds)
         imageView.image = photos[indexPath.item]
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10 // Adjust corner radius as needed
+        
         cell.contentView.addSubview(imageView)
         return cell
     }
