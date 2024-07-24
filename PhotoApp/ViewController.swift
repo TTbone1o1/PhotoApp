@@ -1,5 +1,6 @@
 import AVFoundation
 import UIKit
+import Photos
 
 class ViewController: UIViewController {
 
@@ -29,7 +30,7 @@ class ViewController: UIViewController {
         return outerCircle
     }()
     
-    // Thumbnail view to display captured photo
+    // ThumbnailView Displays the last captured photo
     private let thumbnailView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -42,7 +43,7 @@ class ViewController: UIViewController {
         return imageView
     }()
     
-    // Image view to display captured photo
+    // Image view to display captured photo in full screen
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -51,8 +52,10 @@ class ViewController: UIViewController {
         return imageView
     }()
     
+    // Haptics
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
     
+    // Sets up the view and adds the preview layer, It also sets up tap gestures for taking photos, viewing images, and handling thumbnail interactions
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -71,8 +74,14 @@ class ViewController: UIViewController {
         // Add tap gesture recognizer to thumbnailView
         let thumbnailTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapThumbnailView))
         thumbnailView.addGestureRecognizer(thumbnailTapGesture)
+
+        // Add swipe gesture recognizer for navigating to photo library screen
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeLeft))
+        swipeGesture.direction = .left
+        view.addGestureRecognizer(swipeGesture)
     }
 
+    // Lays out the subviews. Meant for positioning
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer.frame = view.bounds
@@ -86,6 +95,7 @@ class ViewController: UIViewController {
         view.bringSubviewToFront(shutterButton)
     }
 
+    // Check the camera's permission and sets up if granted
     private func checkCameraPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .notDetermined:
@@ -106,6 +116,7 @@ class ViewController: UIViewController {
         }
     }
 
+    // Configures the camera session by adding input (camera) and output (photo capture) to the session and starts it
     private func setupCamera() {
         let session = AVCaptureSession()
         if let device = AVCaptureDevice.default(for: .video) {
@@ -130,6 +141,7 @@ class ViewController: UIViewController {
         }
     }
 
+    // Handles the shutter button tap, generates haptic feedback, and captures a photo. It also includes an animation sequence for the shutter button.
     @objc private func didTapTakePhoto() {
         feedbackGenerator.impactOccurred() // Haptic feedback
         
@@ -175,6 +187,7 @@ class ViewController: UIViewController {
         output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
     }
 
+    // Handles the image view tap to hide the displayed image, restart the camera session, and show the shutter button again.
     @objc private func didTapImageView() {
         UIView.animate(withDuration: 0.3, animations: {
             self.imageView.alpha = 0
@@ -188,10 +201,11 @@ class ViewController: UIViewController {
         }
     }
     
+    // Handles the thumbnail view tap to show the full-screen image view with an animation.
     @objc private func didTapThumbnailView() {
         feedbackGenerator.impactOccurred()
         
-        // Get the initial and final frames
+        // Convert frames to view's coordinate space
         let thumbnailInitialFrame = thumbnailView.convert(thumbnailView.bounds, to: view)
         let imageViewFinalFrame = view.convert(imageView.bounds, from: imageView)
         
@@ -211,8 +225,8 @@ class ViewController: UIViewController {
         imageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         view.addSubview(imageView)
         
-        // Perform the animation
-        UIView.animate(withDuration: 0.3, animations: {
+        // Perform the animation with Core Animation
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
             // Animate the snapshot to match the final image view frame
             thumbnailSnapshot.frame = imageViewFinalFrame
             thumbnailSnapshot.alpha = 0
@@ -226,14 +240,42 @@ class ViewController: UIViewController {
             self.thumbnailView.isHidden = false
         })
     }
+
+    // Handles swipe left to show the photo library screen
+    @objc private func didSwipeLeft() {
+        let photoLibraryVC = PhotoLibraryViewController()
+        photoLibraryVC.modalPresentationStyle = .fullScreen
+        present(photoLibraryVC, animated: true, completion: nil)
+    }
+
+    // Save photo to library
+    private func savePhotoToLibrary(_ image: UIImage) {
+        PHPhotoLibrary.requestAuthorization { status in
+            if status == .authorized {
+                PHPhotoLibrary.shared().performChanges({
+                    PHAssetCreationRequest.creationRequestForAsset(from: image)
+                }) { success, error in
+                    if success {
+                        print("Photo saved to library")
+                    } else if let error = error {
+                        print("Error saving photo: \(error.localizedDescription)")
+                    }
+                }
+            } else {
+                print("Photo library access denied")
+            }
+        }
+    }
 }
 
+// Captures the photo, processes it, stores it in capturedPhotos, updates the thumbnailView, and displays the captured image in the imageView with an animation.
 extension ViewController: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let data = photo.fileDataRepresentation(), let image = UIImage(data: data) else {
             return
         }
         capturedPhotos.append(image)
+        savePhotoToLibrary(image) // Save to photo library
         thumbnailView.image = image
         thumbnailView.transform = .identity // Reset thumbnail view transformation
         
@@ -250,9 +292,9 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         
         // Animate the image view appearing
         self.imageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.6, options: [.curveEaseInOut], animations: {
-                    self.imageView.transform = CGAffineTransform.identity
-                    self.imageView.alpha = 1
-                })
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.6, options: [.curveEaseInOut], animations: {
+            self.imageView.transform = CGAffineTransform.identity
+            self.imageView.alpha = 1
+        })
     }
 }
