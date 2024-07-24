@@ -12,6 +12,10 @@ class PhotoLibraryViewController: UIViewController, UICollectionViewDataSource, 
         return collectionView
     }()
     
+    private var expandedImageView: UIImageView?
+    private var isImageExpanded = false
+    private var originalIndexPath: IndexPath?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -69,6 +73,10 @@ class PhotoLibraryViewController: UIViewController, UICollectionViewDataSource, 
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10 // Adjust corner radius as needed
+        imageView.isUserInteractionEnabled = true
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleImageTap(_:)))
+        imageView.addGestureRecognizer(tapGesture)
         
         cell.contentView.addSubview(imageView)
         return cell
@@ -77,9 +85,52 @@ class PhotoLibraryViewController: UIViewController, UICollectionViewDataSource, 
     // MARK: - UICollectionViewDelegateFlowLayout
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (view.bounds.width - 20) / 3
-        return CGSize(width: width, height: width)
+        if isImageExpanded {
+            return view.bounds.size
+        } else {
+            let width = (view.bounds.width - 20) / 3
+            return CGSize(width: width, height: width)
+        }
     }
+    
+    // MARK: - Gesture Handling
+    
+    @objc private func handleImageTap(_ sender: UITapGestureRecognizer) {
+        guard let tappedImageView = sender.view as? UIImageView else { return }
+        let tappedIndexPath = collectionView.indexPath(for: collectionView.visibleCells.first(where: { ($0.contentView.subviews.first as? UIImageView) == tappedImageView })!)
+
+        if isImageExpanded {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.expandedImageView?.frame = self.originalIndexPath.flatMap { indexPath in
+                    self.collectionView.cellForItem(at: indexPath)?.contentView.bounds
+                } ?? .zero
+                self.view.backgroundColor = .black
+                self.collectionView.alpha = 1
+            }) { _ in
+                self.expandedImageView?.removeFromSuperview()
+                self.isImageExpanded = false
+            }
+        } else {
+            let expandedImageView = UIImageView(frame: collectionView.convert(tappedImageView.frame, from: tappedImageView.superview))
+            expandedImageView.image = tappedImageView.image
+            expandedImageView.contentMode = .scaleAspectFit
+            expandedImageView.backgroundColor = .black
+            expandedImageView.isUserInteractionEnabled = true
+            expandedImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleImageTap(_:))))
+            
+            view.addSubview(expandedImageView)
+            self.expandedImageView = expandedImageView
+            self.originalIndexPath = tappedIndexPath
+            
+            UIView.animate(withDuration: 0.3) {
+                expandedImageView.frame = self.view.bounds
+                self.view.backgroundColor = .black
+                self.collectionView.alpha = 0
+            }
+            isImageExpanded = true
+        }
+    }
+
     
     // Handles swipe right to return to ViewController
     @objc private func didSwipeRight() {
