@@ -1,8 +1,5 @@
-// SceneDelegate.swift
-// PhotoApp
-// Created by Abraham May on 7/21/24.
-
 import UIKit
+import SwiftUI
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -12,14 +9,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Ensure we have a UIWindowScene
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
-        // Create a new UIWindow using the windowScene
+        // Create a SwiftUI view that provides the content for the window
+        let contentView = ContentView()
+
+        // Create the window and set the content view as the root view
         let window = UIWindow(windowScene: windowScene)
-        
-        // Set the root view controller to PhotoAppFront
-        let photoAppFront = PhotoAppFront()
-        window.rootViewController = UINavigationController(rootViewController: photoAppFront)
-        
-        // Assign the window to the window property and make it key and visible
+        window.rootViewController = UIHostingController(rootView: contentView)
         self.window = window
         window.makeKeyAndVisible()
     }
